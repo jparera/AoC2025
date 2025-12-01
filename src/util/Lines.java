@@ -140,13 +140,13 @@ public class Lines {
     }
 
     public static class Matrix<E, T> {
-        private int rows;
+        private final int rows;
 
-        private int cols;
+        private final int cols;
 
-        private T[] arrays;
+        private final T[] arrays;
 
-        private List<E> elements;
+        private final List<E> elements;
 
         Matrix(int rows, int cols, T[] arrays, List<E> elements) {
             this.rows = rows;
