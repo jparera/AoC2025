@@ -36,13 +36,13 @@ public class Day01 {
             if (complete > 0) {
                 part2 += complete;
             }
-            if (remainder > 0 && dial != 0 && (end <= 0 || end >= 100)) {
+            if (remainder > 0 && dial != 0 && (end <= 0 || end >= DIAL_LENGTH)) {
                 part2++;
             }
 
-            dial = end % 100;
+            dial = end % DIAL_LENGTH;
             if (dial < 0) {
-                dial += 100;
+                dial += DIAL_LENGTH;
             }
         }
 
