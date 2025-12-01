@@ -8,7 +8,7 @@ public class Day01 {
     private static final int DIAL_START = 50;
     private static final int DIAL_LENGTH = 100;
 
-    public static void main(String[] args) throws IOException {
+    public static void main() throws IOException {
         var terminal = Terminal.get();
         var path = Path.of("input01.txt");
 
