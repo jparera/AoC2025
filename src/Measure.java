@@ -21,7 +21,7 @@ void main(String[] args) throws Exception {
 
     out.print("Warming up...");
     var warmupLoops = Math.min(Math.max(loops / 10, 3), 100);
-    for (int i = 0; i < Math.max(loops / 10, 3); i++) {
+    for (int i = 0; i < warmupLoops; i++) {
         solution.call();
     }
     out.printf(" done after %d iterations\n", warmupLoops);
