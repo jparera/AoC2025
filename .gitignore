@@ -31,6 +31,8 @@ replay_pid*
 /.gradle
 # Visual Studio Code directory
 /.vscode
+# IntelliJ directory
+/.idea
 
 # Build directories
 /bin
