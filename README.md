@@ -15,7 +15,7 @@ Each day's solution is a separate Java class located in the `src/` directory. Th
 
 To run a solution:
 
-1. Download the input data for the desired day from Advent of Code ([https://adventofcode.com/2024](https://adventofcode.com/2024)).
+1. Download the input data for the desired day from Advent of Code ([https://adventofcode.com/2025](https://adventofcode.com/2025)).
 2. Place the input data in a file named `inputXX.txt` in the root directory of this repository, where XX is the day number.
 3. Open a terminal or command prompt and navigate to the root directory of the repository.
 4. Execute the desired solution class:
