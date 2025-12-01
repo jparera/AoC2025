@@ -23,11 +23,11 @@ public class Day01 {
             var complete = count / DIAL_LENGTH;
             var remainder = count % DIAL_LENGTH;
 
-            int end = switch (direction) {
-                case 'L' -> (dial - remainder);
-                case 'R' -> (dial + remainder);
+            int end = dial + (switch (direction) {
+                case 'L' -> -remainder;
+                case 'R' -> remainder;
                 default -> throw new IllegalStateException("Unexpected direction: " + direction);
-            };
+            });
 
             if (end % 100 == 0) {
                 part1++; 
