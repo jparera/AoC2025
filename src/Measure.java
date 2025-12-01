@@ -23,22 +23,22 @@ public class Measure {
         out.print("Warming up...");
         var warmupLoops = Math.min(Math.max(loops / 10, 3), 100);
         for (int i = 0; i < Math.max(loops / 10, 3); i++) {
-            solution.call(new String[0]);
+            solution.call();
         }
         out.printf(" done after %d iterations\n", warmupLoops);
 
         out.print("Measuring...");
         var start = System.nanoTime();
         for (int i = 0; i < loops; i++) {
-            solution.call(new String[0]);
+            solution.call();
         }
         var end = System.nanoTime();
         out.printf(" done after %d iterations\n", loops);
 
         var tdelta = (double) end - start;
         var ldelta = tdelta / loops;
-        var tconv = NanoConversor.find(tdelta);
-        var lconv = NanoConversor.find(ldelta);
+        var tconv = NanoConverter.find(tdelta);
+        var lconv = NanoConverter.find(ldelta);
         var ttime = tconv.convert(tdelta);
         var ltime = lconv.convert(ldelta);
         out.printf("Total execution time: %.1f %s\n", ttime, tconv.text());
@@ -55,18 +55,18 @@ public class Measure {
         return Objects.toString(value, defaultValue);
     }
 
-    private record NanoConversor(String text, int factor) {
-        private final static NanoConversor IDENTITY = new NanoConversor("ns", 1);
+    private record NanoConverter(String text, int factor) {
+        private final static NanoConverter IDENTITY = new NanoConverter("ns", 1);
 
-        private final static NanoConversor[] CONVERSORS = {
-                new NanoConversor("s", 1000000000),
-                new NanoConversor("ms", 1000000),
-                new NanoConversor("μs", 1000),
+        private final static NanoConverter[] CONVERTERS = {
+                new NanoConverter("s", 1000000000),
+                new NanoConverter("ms", 1000000),
+                new NanoConverter("μs", 1000),
                 IDENTITY,
         };
 
-        static NanoConversor find(double nanos) {
-            return Arrays.stream(CONVERSORS)
+        static NanoConverter find(double nanos) {
+            return Arrays.stream(CONVERTERS)
                     .filter(c -> c.convert(nanos) > 1)
                     .findFirst().orElse(IDENTITY);
         }
@@ -78,6 +78,6 @@ public class Measure {
 
     @FunctionalInterface
     private interface Solution {
-        void call(String[] args) throws Exception;
+        void call() throws Exception;
     }
 }
