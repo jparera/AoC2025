@@ -33,6 +33,8 @@ replay_pid*
 /.vscode
 # IntelliJ directory
 /.idea
+# IntelliJ module files at the root level
+/*.iml
 
 # Build directories
 /bin
