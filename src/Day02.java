@@ -20,11 +20,11 @@ public class Day02 {
                 .toList();
 
         var part1 = ranges.parallelStream()
-                .flatMapToLong(Range::invalidsIdsPart1)
+                .flatMapToLong(Range::invalidIdsPart1)
                 .sum();
 
         var part2 = ranges.parallelStream()
-                .flatMapToLong(Range::invalidsIdsPart2)
+                .flatMapToLong(Range::invalidIdsPart2)
                 .sum();
 
         terminal.println(part1);
@@ -32,15 +32,15 @@ public class Day02 {
     }
 
     record Range(String start, String end) {
-        public LongStream invalidsIdsPart1() {
-            return invalidsIds(length -> length % 2 != 0 ? List.of() : List.of(2));
+        public LongStream invalidIdsPart1() {
+            return invalidIds(length -> length % 2 != 0 ? List.of() : List.of(2));
         }
 
-        public LongStream invalidsIdsPart2() {
-            return invalidsIds(Range::divisors);
+        public LongStream invalidIdsPart2() {
+            return invalidIds(Range::divisors);
         }
 
-        private LongStream invalidsIds(Function<Integer, List<Integer>> divisors) {
+        private LongStream invalidIds(Function<Integer, List<Integer>> divisors) {
             var min = Long.parseLong(this.start);
             var max = Long.parseLong(this.end);
             var invalids = new HashSet<Long>();
