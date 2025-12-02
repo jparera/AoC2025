@@ -44,7 +44,7 @@ public class Day02 {
             var min = Long.parseLong(this.start);
             var max = Long.parseLong(this.end);
             var invalids = new HashSet<Long>();
-            for (var length : Set.copyOf(List.of(start.length(), end.length()))) {
+            for (var length : lengths()) {
                 for (var divisor : divisors.apply(length)) {
                     var blockLength = length / divisor;
                     var numbers = numbers(blockLength);
@@ -61,6 +61,14 @@ public class Day02 {
                 }
             }
             return invalids.stream().mapToLong(Long::longValue);
+        }
+
+        private Collection<Integer> lengths() {
+            var lengths = new HashSet<Integer>();
+            for(int i = start.length(); i <= end.length(); i++) {
+                lengths.add(i);
+            }
+            return lengths;
         }
 
         private static final Map<Integer, List<Long>> MEMO_NUMBERS = new ConcurrentHashMap<>();
