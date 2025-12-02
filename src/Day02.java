@@ -65,7 +65,7 @@ public class Day02 {
 
         private Collection<Integer> lengths() {
             var lengths = new HashSet<Integer>();
-            for(int i = start.length(); i <= end.length(); i++) {
+            for (int i = start.length(); i <= end.length(); i++) {
                 lengths.add(i);
             }
             return lengths;
@@ -74,35 +74,29 @@ public class Day02 {
         private static final Map<Integer, List<Long>> MEMO_NUMBERS = new ConcurrentHashMap<>();
 
         private static List<Long> numbers(int length) {
-            var cached = MEMO_NUMBERS.get(length);
-            if (cached != null) {
-                return cached;
-            }
-            var numbers = new ArrayList<Long>();
-            var start = Math.powExact(10L, length - 1);
-            var end = Math.powExact(10L, length);
-            for (long i = start; i < end; i++) {
-                numbers.add(i);
-            }
-            MEMO_NUMBERS.put(length, numbers);
-            return numbers;
+            return MEMO_NUMBERS.computeIfAbsent(length, _ -> {
+                var numbers = new ArrayList<Long>();
+                var start = Math.powExact(10L, length - 1);
+                var end = Math.powExact(10L, length);
+                for (long i = start; i < end; i++) {
+                    numbers.add(i);
+                }
+                return numbers;
+            });
         }
 
         private static final Map<Integer, List<Integer>> MEMO_DIVISORS = new ConcurrentHashMap<>();
 
         private static List<Integer> divisors(int value) {
-            var cached = MEMO_DIVISORS.get(value);
-            if (cached != null) {
-                return cached;
-            }
-            var divisors = new ArrayList<Integer>();
-            for (int i = 2; i <= value; i++) {
-                if (value % i == 0) {
-                    divisors.add(i);
+            return MEMO_DIVISORS.computeIfAbsent(value, _ -> {
+                var divisors = new ArrayList<Integer>();
+                for (int i = 2; i <= value; i++) {
+                    if (value % i == 0) {
+                        divisors.add(i);
+                    }
                 }
-            }
-            MEMO_DIVISORS.put(value, divisors);
-            return divisors;
+                return divisors;
+            });
         }
 
         public static Range parse(String value) {
