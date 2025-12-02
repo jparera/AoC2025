@@ -44,7 +44,7 @@ public class Day02 {
             var min = Long.parseLong(this.start);
             var max = Long.parseLong(this.end);
             var invalids = new HashSet<Long>();
-            for (var length : List.of(start.length(), end.length())) {
+            for (var length : Set.copyOf(List.of(start.length(), end.length()))) {
                 for (var divisor : divisors.apply(length)) {
                     var blockLength = length / divisor;
                     var numbers = numbers(blockLength);
