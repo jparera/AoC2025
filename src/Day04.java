@@ -3,8 +3,9 @@ import util.Terminal;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
-import java.util.function.Consumer;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
