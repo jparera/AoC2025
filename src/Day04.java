@@ -27,17 +27,17 @@ public class Day04 {
             }
         }
 
-        // Find all removable positions
-        var toRemove = positions.parallelStream()
+        // Find all rolls that can be removed initially
+        var rollsToRemove = positions.parallelStream()
                 .filter(p -> removable(p, positions))
                 .collect(Collectors.toSet());
-        var part1 = toRemove.size();
+        var part1 = rollsToRemove.size();
         var part2 = 0;
-        while (!toRemove.isEmpty()) {
-            positions.removeAll(toRemove);
-            part2 += toRemove.size();
-            // Check neighbours of removed positions for further removals
-            toRemove = toRemove.parallelStream()
+        while (!rollsToRemove.isEmpty()) {
+            positions.removeAll(rollsToRemove);
+            part2 += rollsToRemove.size();
+            // Check neighbours of removed rolls for further removals
+            rollsToRemove = rollsToRemove.parallelStream()
                     .flatMap(Position::neighbours)
                     .filter(p -> removable(p, positions))
                     .collect(Collectors.toSet());
@@ -48,7 +48,7 @@ public class Day04 {
     }
 
     private static boolean removable(Position p, Set<Position> positions) {
-        if(!positions.contains(p)) return false;
+        if (!positions.contains(p)) return false;
         int count = 0;
         for (int[] offset : OFFSETS) {
             var neighbor = p.add(offset);
