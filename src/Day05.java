@@ -24,6 +24,8 @@ public class Day05 {
     }
 
     private static long countFreshIds(List<Range> ranges) {
+        if (ranges.isEmpty()) return 0L;
+
         ranges = new ArrayList<>(ranges);
         ranges.sort(Comparator.comparingLong(Range::start));
         var fused = new LinkedList<Range>();
@@ -39,6 +41,7 @@ public class Day05 {
                 fused.offer(range);
             }
         }
+
         return fused.parallelStream().mapToLong(Range::length).sum();
     }
 
