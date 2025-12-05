@@ -47,11 +47,11 @@ public class Day05 {
             return start <= value && value <= end;
         }
 
-        private long length() {
+        public long length() {
             return end - start + 1;
         }
 
-        private boolean overlaps(Range other) {
+        public boolean overlaps(Range other) {
             return this.start <= other.end && other.start <= this.end;
         }
 
