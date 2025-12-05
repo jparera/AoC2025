@@ -9,8 +9,8 @@ public class Day05 {
     public static void main() throws IOException {
         var terminal = Terminal.get();
         var path = Path.of("input05.txt");
-        var ranges = Lines.asBlocks(path).get(0).parallelStream().map(Range::parse).toList();
-        var ids = Lines.asBlocks(path).get(1).parallelStream().mapToLong(Long::parseLong).toArray();
+        var ranges = Lines.asBlocks(path).get(0).stream().map(Range::parse).toList();
+        var ids = Lines.asBlocks(path).get(1).stream().mapToLong(Long::parseLong).toArray();
 
         var part1 = Arrays.stream(ids).parallel().filter(id -> spoiled(id, ranges)).count();
         var part2 = countFreshIds(ranges);
@@ -20,7 +20,7 @@ public class Day05 {
     }
 
     private static boolean spoiled(long id, List<Range> ranges) {
-        return ranges.parallelStream().anyMatch(range -> range.contains(id));
+        return ranges.stream().anyMatch(range -> range.contains(id));
     }
 
     private static long countFreshIds(List<Range> ranges) {
@@ -42,7 +42,7 @@ public class Day05 {
             }
         }
 
-        return fused.parallelStream().mapToLong(Range::length).sum();
+        return fused.stream().mapToLong(Range::length).sum();
     }
 
     record Range(long start, long end) {
