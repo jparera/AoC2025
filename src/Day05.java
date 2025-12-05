@@ -13,7 +13,7 @@ public class Day05 {
         var ids = Lines.asBlocks(path).get(1).stream().mapToLong(Long::parseLong).toArray();
 
         var merged = merged(ranges);
-        var part1 = Arrays.stream(ids).parallel().filter(id -> spoiled(id, merged)).count();
+        var part1 = Arrays.stream(ids).filter(id -> spoiled(id, merged)).count();
         var part2 = Arrays.stream(merged).mapToLong(Range::length).sum();
 
         terminal.println(part1);
