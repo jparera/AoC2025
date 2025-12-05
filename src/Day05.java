@@ -20,8 +20,19 @@ public class Day05 {
         terminal.println(part2);
     }
 
-    private static boolean spoiled(long id, Range[] ranges) {
-        return Arrays.stream(ranges).anyMatch(range -> range.contains(id));
+    private static boolean spoiled(long id, Range[] merged) {
+        int lo = 0, hi = merged.length - 1;
+        while (lo <= hi) {
+            int mid = (lo + hi) >>> 1;
+            if (id < merged[mid].start()) {
+                hi = mid - 1;
+            } else if (id > merged[mid].end()) {
+                lo = mid + 1;
+            } else {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static Range[] merged(List<Range> ranges) {
@@ -51,10 +62,6 @@ public class Day05 {
     }
 
     record Range(long start, long end) {
-        public boolean contains(long value) {
-            return start <= value && value <= end;
-        }
-
         public long length() {
             return end - start + 1L;
         }
