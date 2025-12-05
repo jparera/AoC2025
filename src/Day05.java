@@ -12,37 +12,42 @@ public class Day05 {
         var ranges = Lines.asBlocks(path).get(0).stream().map(Range::parse).toList();
         var ids = Lines.asBlocks(path).get(1).stream().mapToLong(Long::parseLong).toArray();
 
-        var part1 = Arrays.stream(ids).parallel().filter(id -> spoiled(id, ranges)).count();
-        var part2 = countFreshIds(ranges);
+        var merged = merged(ranges);
+        var part1 = Arrays.stream(ids).parallel().filter(id -> spoiled(id, merged)).count();
+        var part2 = Arrays.stream(merged).mapToLong(Range::length).sum();
 
         terminal.println(part1);
         terminal.println(part2);
     }
 
-    private static boolean spoiled(long id, List<Range> ranges) {
-        return ranges.stream().anyMatch(range -> range.contains(id));
+    private static boolean spoiled(long id, Range[] ranges) {
+        return Arrays.stream(ranges).anyMatch(range -> range.contains(id));
     }
 
-    private static long countFreshIds(List<Range> ranges) {
-        if (ranges.isEmpty()) return 0L;
+    private static Range[] merged(List<Range> ranges) {
+        if (ranges == null || ranges.isEmpty()) return new Range[0];
 
-        ranges = new ArrayList<>(ranges);
-        ranges.sort(Comparator.comparingLong(Range::start));
-        var fused = new LinkedList<Range>();
-        fused.offer(ranges.getFirst());
-        for (var range : ranges) {
-            var previous = fused.getLast();
-            if (range.overlaps(previous)) {
-                fused.removeLast();
-                fused.offer(new Range(
-                        Math.min(range.start(), previous.start()),
-                        Math.max(range.end(), previous.end())));
+        var rs = ranges.toArray(Range[]::new);
+        Arrays.sort(rs, Comparator.comparingLong(Range::start));
+
+        var merged = new ArrayList<Range>();
+        var currentStart = rs[0].start();
+        var currentEnd = rs[0].end();
+        for (int i = 1; i < ranges.size(); i++) {
+            var nextStart = rs[i].start();
+            var nextEnd = rs[i].end();
+            if (nextStart <= currentEnd + 1) {
+                if (nextEnd > currentEnd) {
+                    currentEnd = nextEnd;
+                }
             } else {
-                fused.offer(range);
+                merged.add(new Range(currentStart, currentEnd));
+                currentStart = nextStart;
+                currentEnd = nextEnd;
             }
         }
-
-        return fused.stream().mapToLong(Range::length).sum();
+        merged.add(new Range(currentStart, currentEnd));
+        return merged.toArray(Range[]::new);
     }
 
     record Range(long start, long end) {
@@ -51,11 +56,7 @@ public class Day05 {
         }
 
         public long length() {
-            return end - start + 1;
-        }
-
-        public boolean overlaps(Range other) {
-            return this.start <= other.end && other.start <= this.end;
+            return end - start + 1L;
         }
 
         public static Range parse(String s) {
