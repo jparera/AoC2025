@@ -31,14 +31,7 @@ public class Day06 {
     private static long part1(List<String> numbers, String[] operations) {
         var operands = Numbers.asIntArrays(numbers);
 
-        var output = new long[operations.length];
-        for (int i = 0; i < operations.length; i++) {
-            output[i] = switch (operations[i].charAt(0)) {
-                case ADD -> 0;
-                case MUL -> 1;
-                default -> throw new IllegalArgumentException("Unknown operation: " + operations[i]);
-            };
-        }
+        var output = initializeOutput(operations);
         for (var operand : operands) {
             for (int i = 0; i < operations.length; i++) {
                 switch (operations[i].charAt(0)) {
@@ -57,7 +50,6 @@ public class Day06 {
         var cols = matrix[0].length;
 
         var operands = new long[cols];
-
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 if (matrix[i][j] == ' ') continue;
@@ -65,14 +57,7 @@ public class Day06 {
             }
         }
 
-        var output = new long[operations.length];
-        for (int i = 0; i < operations.length; i++) {
-            output[i] = switch (operations[i].charAt(0)) {
-                case ADD -> 0;
-                case MUL -> 1;
-                default -> throw new IllegalArgumentException("Unknown operation: " + operations[i]);
-            };
-        }
+        var output = initializeOutput(operations);
         for (int i = 0, j = 0; i < operations.length; i++) {
             int operandsCount = operations[i].length();
             for (int k = 0; k < operandsCount; k++) {
@@ -86,5 +71,17 @@ public class Day06 {
         }
 
         return Arrays.stream(output).sum();
+    }
+
+    private static long[] initializeOutput(String[] operations) {
+        var output = new long[operations.length];
+        for (int i = 0; i < operations.length; i++) {
+            output[i] = switch (operations[i].charAt(0)) {
+                case ADD -> 0;
+                case MUL -> 1;
+                default -> throw new IllegalArgumentException("Unknown operation: " + operations[i]);
+            };
+        }
+        return output;
     }
 }
