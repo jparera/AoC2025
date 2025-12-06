@@ -6,7 +6,7 @@ import java.util.Objects;
 final String DEFAULT_LOOPS = "10";
 
 final Solution[] SOLUTIONS = {
-        Day01::main, Day02::main, Day03::main, Day04::main, Day05::main
+        Day01::main, Day02::main, Day03::main, Day04::main, Day05::main, Day06::main,
 };
 
 void main(String[] args) throws Exception {
