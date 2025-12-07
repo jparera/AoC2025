@@ -79,7 +79,7 @@ public class Day07 {
                     this.part1.add(splitter);
                     splitted = true;
                     for (var next : splitter.split()) {
-                        paths += countPaths(next);
+                        paths = Math.addExact(paths, countPaths(next));
                     }
                     break;
                 }
