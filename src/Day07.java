@@ -17,7 +17,7 @@ public class Day07 {
 
         private static final char SPLITTER = '^';
 
-        private final Map<Integer, List<Splitter>> splittersByCol;
+        private final Map<Integer, ? extends List<Splitter>> splittersByCol;
 
         private final Map<Beam, Long> memo = new HashMap<>();
 
@@ -25,7 +25,7 @@ public class Day07 {
 
         private final Beam start;
 
-        private Manifold(Beam start, Map<Integer, List<Splitter>> splittersByCol) {
+        private Manifold(Beam start, Map<Integer, ? extends List<Splitter>> splittersByCol) {
             this.start = start;
             this.splittersByCol = splittersByCol;
         }
@@ -72,23 +72,30 @@ public class Day07 {
                 return memo.get(beam);
             }
             long paths = 0;
-            var splittersOnPath = splittersByCol.getOrDefault(beam.col(), List.of());
-            var splitted = false;
-            for (var splitter : splittersOnPath) {
-                if (splitter.row() >= beam.row()) {
-                    this.part1.add(splitter);
-                    splitted = true;
-                    for (var next : splitter.split()) {
-                        paths = Math.addExact(paths, countPaths(next));
-                    }
-                    break;
+            var splitter = findFirstSplitterAtOrBelow(beam);
+            if (splitter != null) {
+                this.part1.add(splitter);
+                for (var nextBeam : splitter.split()) {
+                    paths = Math.addExact(paths, countPaths(nextBeam));
                 }
-            }
-            if (!splitted) {
+            } else {
                 paths = 1;
             }
             memo.put(beam, paths);
             return paths;
+        }
+
+        private Splitter findFirstSplitterAtOrBelow(Beam beam) {
+            var splittersOnPath = splittersByCol.get(beam.col());
+            if (splittersOnPath == null) {
+                return null;
+            }
+            for (var splitter : splittersOnPath) {
+                if (splitter.row() >= beam.row()) {
+                    return splitter;
+                }
+            }
+            return null;
         }
     }
 
