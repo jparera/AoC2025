@@ -270,94 +270,88 @@ public class Terminal {
         return buffer.toString();
     }
 
-    private static class Job {
-        private static final String ESC = "\u001B";
+    private record Job(String command) {
+            private static final String ESC = "\u001B";
 
-        static Job ENTER_ALTERNATE_SCREEN = new Job(ESC + "[?1049h");
-        
+            static Job ENTER_ALTERNATE_SCREEN = new Job(ESC + "[?1049h");
+
         static Job EXIT_ALTERNATE_SCREEN = new Job(ESC + "[?1049l");
 
-        static Job CLEAR = new Job(ESC + "[2J");
+            static Job CLEAR = new Job(ESC + "[2J");
 
-        static Job CURSOR_HOME = new Job(ESC + "[H");
+            static Job CURSOR_HOME = new Job(ESC + "[H");
 
-        static Job TURNOFF_ATTRIBUTES = new Job(ESC + "[0m");
+            static Job TURNOFF_ATTRIBUTES = new Job(ESC + "[0m");
 
-        static Job HIGHLIGHT_COLOR = color(0x99, 0xFF, 0x99);
+            static Job HIGHLIGHT_COLOR = color(0x99, 0xFF, 0x99);
 
-        static Job ACCENT_COLOR = color(0xE6, 0x41, 0x0B);
+            static Job ACCENT_COLOR = color(0xE6, 0x41, 0x0B);
 
-        static Job DEFAULT_COLOR = color(0x00, 0x99, 0x00);
+            static Job DEFAULT_COLOR = color(0x00, 0x99, 0x00);
 
-        static Job HIGHLIGHT_BACKGROUND = background(0x05, 0x05, 0x05);
-
-        private final String command;
-
-        Job(String command) {
-            this.command = command;
-        }
+            static Job HIGHLIGHT_BACKGROUND = background(0x05, 0x05, 0x05);
 
         @Override
-        public String toString() {
-            return command;
+            public String toString() {
+                return command;
+            }
+
+            public static Builder builder() {
+                return new Builder();
+            }
+
+            public static Job color(int r, int g, int b) {
+                return new Job(ESC + "[38;2;" + r + ";" + g + ";" + b + "m");
+            }
+
+            public static Job background(int r, int g, int b) {
+                return new Job(ESC + "[48;2;" + r + ";" + g + ";" + b + "m");
+            }
+
+            static class Builder {
+                private final StringBuilder buffer = new StringBuilder();
+
+                public Job build() {
+                    return new Job(buffer.toString());
+                }
+
+                public Builder turnOffAttributes() {
+                    return append(TURNOFF_ATTRIBUTES);
+                }
+
+                public Builder highlightColor() {
+                    return append(HIGHLIGHT_COLOR);
+                }
+
+                public Builder accentColor() {
+                    return append(ACCENT_COLOR);
+                }
+
+                public Builder defaultColor() {
+                    return append(DEFAULT_COLOR);
+                }
+
+                public Builder highlightBackground() {
+                    return append(HIGHLIGHT_BACKGROUND);
+                }
+
+                public Builder lineSeparator() {
+                    return append(System.lineSeparator());
+                }
+
+                public Builder append(Job job) {
+                    return append(job.toString());
+                }
+
+                public Builder append(char c) {
+                    buffer.append(c);
+                    return this;
+                }
+
+                public Builder append(String text) {
+                    buffer.append(text);
+                    return this;
+                }
+            }
         }
-
-        public static Builder builder() {
-            return new Builder();
-        }
-
-        public static Job color(int r, int g, int b) {
-            return new Job(ESC + "[38;2;" + r + ";" + g + ";" + b + "m");
-        }
-
-        public static Job background(int r, int g, int b) {
-            return new Job(ESC + "[48;2;" + r + ";" + g + ";" + b + "m");
-        }
-
-        static class Builder {
-            private final StringBuilder buffer = new StringBuilder();
-
-            public Job build() {
-                return new Job(buffer.toString());
-            }
-
-            public Builder turnOffAttributes() {
-                return append(TURNOFF_ATTRIBUTES);
-            }
-
-            public Builder highlightColor() {
-                return append(HIGHLIGHT_COLOR);
-            }
-
-            public Builder accentColor() {
-                return append(ACCENT_COLOR);
-            }
-
-            public Builder defaultColor() {
-                return append(DEFAULT_COLOR);
-            }
-
-            public Builder highlightBackground() {
-                return append(HIGHLIGHT_BACKGROUND);
-            }
-
-            public Builder lineSeparator() {
-                return append(System.lineSeparator());
-            }
-
-            public Builder append(Job job) {
-                return append(job.toString());
-            }
-
-            public Builder append(char c) {
-                buffer.append(c);
-                return this;
-            }
-
-            public Builder append(String text) {
-                buffer.append(text);
-                return this;
-            }
-        }
-    }
 }
