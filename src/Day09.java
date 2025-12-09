@@ -23,24 +23,24 @@ public class Day09 {
         terminal.printf("Perimeter tiles: %d%n", perimeterTiles.size());
         terminal.printf("Outside tiles: %d%n", outsideTiles.size());
 
-        var part1 = Long.MIN_VALUE;
-        var part2 = Long.MIN_VALUE;
-        var pairs = 0L;
+        var heap = new PriorityQueue<Pair>();
         var columnIndex = buildColumnIndex(outsideTiles);
         for (int i = 0; i < cornerTiles.length; i++) {
             for (int j = i + 1; j < cornerTiles.length; j++) {
-                part1 = Math.max(part1, cornerTiles[i].area(cornerTiles[j]));
-                if (isValid(cornerTiles[i], cornerTiles[j], columnIndex)) {
-                    part2 = Math.max(part2, cornerTiles[i].area(cornerTiles[j]));
-                }
-                if (pairs % 10000 == 0) {
-                    terminal.printf("Processed pairs: %d%n", pairs);
-                }
-                pairs++;
+                var area = cornerTiles[i].area(cornerTiles[j]);
+                heap.add(new Pair(i, j, area));
             }
         }
-        terminal.printf("Total pairs processed: %d%n", pairs);
-        terminal.println(part1);
+        var part1 = heap.peek();
+        terminal.println(part1 == null ? 0 : part1.area());
+        var part2 = 0L;
+        while (!heap.isEmpty()) {
+            var pair = heap.poll();
+            if (isValid(cornerTiles[pair.i()], cornerTiles[pair.j()], columnIndex)) {
+                part2 = pair.area();
+                break;
+            }
+        }
         terminal.println(part2);
     }
 
@@ -123,6 +123,13 @@ public class Day09 {
             }
         }
         return perimeterTails;
+    }
+
+    record Pair(int i, int j, long area) implements Comparable<Pair> {
+        @Override
+        public int compareTo(Pair o) {
+            return Long.compare(o.area, this.area);
+        }
     }
 
     record Tile(int col, int row) {
