@@ -16,58 +16,8 @@ public class Day09 {
         // Compute all perimeter tiles (including corners)
         var perimeterTiles = getPerimeterTiles(cornerTiles);
 
-        var outsideTiles = new HashSet<Tile>();
-        var stack = new java.util.ArrayDeque<Tile>();
-        var visited = new HashSet<Tile>();
-        var start = new Tile(Integer.MAX_VALUE, Integer.MAX_VALUE);
-        for (var tiles : cornerTiles) {
-            if (tiles.col() < start.col() || (tiles.col() == start.col() && tiles.row() < start.row())) {
-                start = tiles;
-            }
-        }
-        stack.push(new Tile(start.col() - 1, start.row() - 1));
-        while (!stack.isEmpty()) {
-            var current = stack.pop();
-
-            if (perimeterTiles.contains(current)) {
-                continue;
-            }
-
-            if (visited.contains(current)) {
-                continue;
-            }
-            visited.add(current);
-
-            var neighborTiles = current.neighbors();
-            var foundPerimeter = false;
-            for (var neighbor : neighborTiles) {
-                if (perimeterTiles.contains(neighbor)) {
-                    foundPerimeter = true;
-                    break;
-                }
-            }
-            if (!foundPerimeter) {
-                continue;
-            }
-            outsideTiles.add(current);
-            for (var neighbor : neighborTiles) {
-                stack.push(neighbor);
-            }
-        }
-
-        /*
-        var map = new char[10][15];
-        for (int r = 0; r < map.length; r++) {
-            Arrays.fill(map[r], '.');
-        }
-        for (var tile : perimeterTiles) {
-            map[tile.row()][tile.col()] = '#';
-        }
-        for (var tile : outsideTiles) {
-            map[tile.row()][tile.col()] = 'O';
-        }
-        terminal.print(map);
-         */
+        // Compute all outside tiles using a flood fill from outside the shape
+        var outsideTiles = getOutsideTiles(cornerTiles, perimeterTiles);
 
         terminal.printf("Corner tiles: %d%n", cornerTiles.length);
         terminal.printf("Perimeter tiles: %d%n", perimeterTiles.size());
@@ -94,6 +44,42 @@ public class Day09 {
         terminal.println(part2);
     }
 
+    private static HashSet<Tile> getOutsideTiles(Tile[] cornerTiles, HashSet<Tile> perimeterTiles) {
+        var outsideTiles = new HashSet<Tile>();
+        var stack = new ArrayDeque<Tile>();
+        var visited = new HashSet<Tile>();
+        var start = new Tile(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        for (var tiles : cornerTiles) {
+            if (tiles.col() < start.col() || (tiles.col() == start.col() && tiles.row() < start.row())) {
+                start = tiles;
+            }
+        }
+        stack.push(new Tile(start.col() - 1, start.row() - 1));
+        while (!stack.isEmpty()) {
+            var current = stack.pop();
+            if (perimeterTiles.contains(current) || visited.contains(current)) {
+                continue;
+            }
+            visited.add(current);
+            var neighborTiles = current.neighbors();
+            var foundPerimeter = false;
+            for (var neighbor : neighborTiles) {
+                if (perimeterTiles.contains(neighbor)) {
+                    foundPerimeter = true;
+                    break;
+                }
+            }
+            if (!foundPerimeter) {
+                continue;
+            }
+            outsideTiles.add(current);
+            for (var neighbor : neighborTiles) {
+                stack.push(neighbor);
+            }
+        }
+        return outsideTiles;
+    }
+
     private static boolean isValid(Tile a, Tile b, NavigableMap<Integer, NavigableSet<Integer>> columnIndex) {
         var minCol = Math.min(a.col(), b.col());
         var maxCol = Math.max(a.col(), b.col());
@@ -113,7 +99,7 @@ public class Day09 {
     private static NavigableMap<Integer, NavigableSet<Integer>> buildColumnIndex(Set<Tile> outside) {
         var index = new TreeMap<Integer, NavigableSet<Integer>>();
         for (var t : outside) {
-            index.computeIfAbsent(t.col(), c -> new TreeSet<Integer>()).add(t.row());
+            index.computeIfAbsent(t.col(), _ -> new TreeSet<>()).add(t.row());
         }
         return index;
     }
@@ -137,13 +123,6 @@ public class Day09 {
             }
         }
         return perimeterTails;
-    }
-
-    record Pair(int i, int j, long area) implements Comparable<Pair> {
-        @Override
-        public int compareTo(Pair o) {
-            return Long.compare(o.area, this.area);
-        }
     }
 
     record Tile(int col, int row) {
