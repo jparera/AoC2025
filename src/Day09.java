@@ -1,0 +1,172 @@
+import util.Lines;
+import util.Terminal;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.*;
+
+public class Day09 {
+    public static void main() throws IOException {
+        var terminal = Terminal.get();
+        var input = Path.of("input09.txt");
+
+        // Read red tiles are the corners of the shape
+        var cornerTiles = Lines.asStrings(input).stream().map(Tile::parse).toArray(Tile[]::new);
+
+        // Compute all perimeter tiles (including corners)
+        var perimeterTiles = getPerimeterTiles(cornerTiles);
+
+        var outsideTiles = new HashSet<Tile>();
+        var stack = new java.util.ArrayDeque<Tile>();
+        var visited = new HashSet<Tile>();
+        var start = new Tile(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        for (var tiles : cornerTiles) {
+            if (tiles.col() < start.col() || (tiles.col() == start.col() && tiles.row() < start.row())) {
+                start = tiles;
+            }
+        }
+        stack.push(new Tile(start.col() - 1, start.row() - 1));
+        while (!stack.isEmpty()) {
+            var current = stack.pop();
+
+            if (perimeterTiles.contains(current)) {
+                continue;
+            }
+
+            if (visited.contains(current)) {
+                continue;
+            }
+            visited.add(current);
+
+            var neighborTiles = current.neighbors();
+            var foundPerimeter = false;
+            for (var neighbor : neighborTiles) {
+                if (perimeterTiles.contains(neighbor)) {
+                    foundPerimeter = true;
+                    break;
+                }
+            }
+            if (!foundPerimeter) {
+                continue;
+            }
+            outsideTiles.add(current);
+            for (var neighbor : neighborTiles) {
+                stack.push(neighbor);
+            }
+        }
+
+        /*
+        var map = new char[10][15];
+        for (int r = 0; r < map.length; r++) {
+            Arrays.fill(map[r], '.');
+        }
+        for (var tile : perimeterTiles) {
+            map[tile.row()][tile.col()] = '#';
+        }
+        for (var tile : outsideTiles) {
+            map[tile.row()][tile.col()] = 'O';
+        }
+        terminal.print(map);
+         */
+
+        terminal.printf("Corner tiles: %d%n", cornerTiles.length);
+        terminal.printf("Perimeter tiles: %d%n", perimeterTiles.size());
+        terminal.printf("Outside tiles: %d%n", outsideTiles.size());
+
+        var part1 = Long.MIN_VALUE;
+        var part2 = Long.MIN_VALUE;
+        var pairs = 0L;
+        var columnIndex = buildColumnIndex(outsideTiles);
+        for (int i = 0; i < cornerTiles.length; i++) {
+            for (int j = i + 1; j < cornerTiles.length; j++) {
+                part1 = Math.max(part1, cornerTiles[i].area(cornerTiles[j]));
+                if (isValid(cornerTiles[i], cornerTiles[j], columnIndex)) {
+                    part2 = Math.max(part2, cornerTiles[i].area(cornerTiles[j]));
+                }
+                if (pairs % 10000 == 0) {
+                    terminal.printf("Processed pairs: %d%n", pairs);
+                }
+                pairs++;
+            }
+        }
+        terminal.printf("Total pairs processed: %d%n", pairs);
+        terminal.println(part1);
+        terminal.println(part2);
+    }
+
+    private static boolean isValid(Tile a, Tile b, NavigableMap<Integer, NavigableSet<Integer>> columnIndex) {
+        var minCol = Math.min(a.col(), b.col());
+        var maxCol = Math.max(a.col(), b.col());
+        var minRow = Math.min(a.row(), b.row());
+        var maxRow = Math.max(a.row(), b.row());
+        var sub = columnIndex.subMap(minCol, true, maxCol, true);
+        for (var entry : sub.entrySet()) {
+            NavigableSet<Integer> rows = entry.getValue();
+            Integer r = rows.ceiling(minRow);
+            if (r != null && r <= maxRow) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static NavigableMap<Integer, NavigableSet<Integer>> buildColumnIndex(Set<Tile> outside) {
+        var index = new TreeMap<Integer, NavigableSet<Integer>>();
+        for (var t : outside) {
+            index.computeIfAbsent(t.col(), c -> new TreeSet<Integer>()).add(t.row());
+        }
+        return index;
+    }
+
+    private static HashSet<Tile> getPerimeterTiles(Tile[] cornerTiles) {
+        var perimeterTails = new HashSet<Tile>();
+        for (int i = 0; i < cornerTiles.length; i++) {
+            int j = (i + 1) % cornerTiles.length;
+            if (cornerTiles[i].col() - cornerTiles[j].col() == 0) {
+                var min = Math.min(cornerTiles[i].row(), cornerTiles[j].row());
+                var max = Math.max(cornerTiles[i].row(), cornerTiles[j].row());
+                for (int k = min; k <= max; k++) {
+                    perimeterTails.add(new Tile(cornerTiles[i].col(), k));
+                }
+            } else {
+                var min = Math.min(cornerTiles[i].col(), cornerTiles[j].col());
+                var max = Math.max(cornerTiles[i].col(), cornerTiles[j].col());
+                for (int k = min; k <= max; k++) {
+                    perimeterTails.add(new Tile(k, cornerTiles[i].row()));
+                }
+            }
+        }
+        return perimeterTails;
+    }
+
+    record Pair(int i, int j, long area) implements Comparable<Pair> {
+        @Override
+        public int compareTo(Pair o) {
+            return Long.compare(o.area, this.area);
+        }
+    }
+
+    record Tile(int col, int row) {
+        public long area(Tile other) {
+            return Math.multiplyFull(Math.abs(this.col - other.col) + 1, Math.abs(this.row - other.row) + 1);
+        }
+
+        public List<Tile> neighbors() {
+            return Arrays.asList(
+                    new Tile(col + 1, row + 1),
+                    new Tile(col - 1, row + 1),
+                    new Tile(col + 1, row - 1),
+                    new Tile(col - 1, row - 1),
+                    new Tile(col + 1, row),
+                    new Tile(col - 1, row),
+                    new Tile(col, row + 1),
+                    new Tile(col, row - 1)
+            );
+        }
+
+        public static Tile parse(String line) {
+            var parts = line.split(",");
+            return new Tile(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
+        }
+    }
+}
