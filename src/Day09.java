@@ -50,7 +50,11 @@ public class Day09 {
 
         // Compute all outside tiles using a flood fill from outside the shape
         var outsideTiles = getOutsideTiles(cornerTiles, perimeterTiles);
-
+        
+        terminal.printf("Original row index span: %d to %d%n", rows.first(), rows.last());
+        terminal.printf("Original col index span: %d to %d%n", cols.first(), cols.last());
+        terminal.printf("Compressed row index span: %d to %d%n", 0, rows.size() - 1);
+        terminal.printf("Compressed col index span: %d to %d%n", 0, cols.size() - 1);
         terminal.printf("Corner tiles: %d%n", cornerTiles.length);
         terminal.printf("Perimeter tiles: %d%n", perimeterTiles.size());
         terminal.printf("Outside tiles: %d%n", outsideTiles.size());
