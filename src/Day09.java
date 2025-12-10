@@ -11,7 +11,39 @@ public class Day09 {
         var input = Path.of("input09.txt");
 
         // Read red tiles are the corners of the shape
-        var cornerTiles = Lines.asStrings(input).stream().map(Tile::parse).toArray(Tile[]::new);
+        var originalTiles = Lines.asStrings(input).stream().map(Tile::parse).toArray(Tile[]::new);
+
+        // Compress coordinates
+        var rows = new TreeSet<Integer>();
+        var cols = new TreeSet<Integer>();
+        rows.add(0);
+        cols.add(0);
+        for (var tile : originalTiles) {
+            rows.add(tile.row());
+            rows.add(tile.row() + 1);
+            rows.add(tile.row() - 1);
+
+            cols.add(tile.col());
+            cols.add(tile.col() + 1);
+            cols.add(tile.col() - 1);
+        }
+        var rowArray = rows.stream().mapToInt(Integer::intValue).toArray();
+        var colArray = cols.stream().mapToInt(Integer::intValue).toArray();
+        var rowMap = new HashMap<Integer, Integer>();
+        var colMap = new HashMap<Integer, Integer>();
+        for (int i = 0; i < rowArray.length; i++) {
+            rowMap.put(rowArray[i], i);
+        }
+        for (int i = 0; i < colArray.length; i++) {
+            colMap.put(colArray[i], i);
+        }
+        var cornerTiles = new Tile[originalTiles.length];
+        for (int i = 0; i < originalTiles.length; i++) {
+            var tile = originalTiles[i];
+            var mappedCol = colMap.get(tile.col());
+            var mappedRow = rowMap.get(tile.row());
+            cornerTiles[i] = new Tile(mappedCol, mappedRow);
+        }
 
         // Compute all perimeter tiles (including corners)
         var perimeterTiles = getPerimeterTiles(cornerTiles);
@@ -27,7 +59,7 @@ public class Day09 {
         var columnIndex = buildColumnIndex(outsideTiles);
         for (int i = 0; i < cornerTiles.length; i++) {
             for (int j = i + 1; j < cornerTiles.length; j++) {
-                var area = cornerTiles[i].area(cornerTiles[j]);
+                var area = originalTiles[i].area(originalTiles[j]);
                 heap.add(new Pair(i, j, area));
             }
         }
