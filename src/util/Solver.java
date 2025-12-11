@@ -52,7 +52,6 @@ public class Solver {
                 // no direct positive-only constraint found — keep global cap
                 perVarMax[var] = implicitMax;
             } else {
-                if (best < 0) best = 0;
                 perVarMax[var] = Math.min(best, implicitMax);
             }
         }
