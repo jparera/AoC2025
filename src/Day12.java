@@ -229,9 +229,14 @@ public class Day12 {
             }
 
             private boolean dfs(BitSet filled, int from, int[] presentsPerShape, int requiredArea) {
-                if (requiredArea == 0) {
+                 if (requiredArea == 0) {
                     return true;
                 }
+                // Not enough space left to fill the required area.
+                if (totalArea - from < requiredArea) {
+                    return false;
+                }
+
                 var freeArea = totalArea - filled.cardinality();
                 if (requiredArea > freeArea) {
                     return false;
